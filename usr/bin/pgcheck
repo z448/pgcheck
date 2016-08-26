@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use warnings;
+
+my $activator_cache = "/var/mobile/Library/Caches/libactivator.plist";
+my @files = qw< /--early-boot /var/root/test.app /private/var/tmp/crw /private/var/tmp/cr /private/var/tmp/st_data >;
+my @found = ();
+
+sub daemonize {
+    chdir '/'               or die "Can't chdir to /: $!";
+    open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
+    open STDOUT, '>>/dev/null' or die "Can't write to /dev/null: $!";
+   
+    defined(my $pid = fork) or die "Can't fork: $!";
+    exit if $pid;
+    setsid                  or die "Can't start a new session: $!";
+    open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
+}
+
+daemonize();
+
+sub init_activator {
+    unless(`activator get LAMessageListeners`){
+        system("plutil -key LAMessageListeners -dict $activator_cache");
+    }
+    system("plutil -key LAMessageListeners -key libactivator.message.show.pgcheck -dict $activator_cache");
+    system("plutil -key LAMessageListeners -key libactivator.message.show.pgcheck -key title -value pgcheck $activator_cache");
+    system("plutil -key LAMessageListeners -key libactivator.message.show.pgcheck -key message -value \"Your device might contain Pegasus Spyware\" $activator_cache");
+    system("kill -9 $(ps aux | grep SpringBoard | grep -v grep | cut -d' ' -f5");
+}
+
+sub init {
+    my $init_pgcheck = `activator get LAMessageListeners | grep pgcheck`;
+    unless($init_pgcheck){
+        init_activator();
+    }
+}
+
+sub start {
+    for( @files ){
+        push @found, $_ if -f;
+    }
+
+    if(@found){
+        system("activator send libactivator.message.show.pgcheck");
+        #print "\n!!Your device might be infected!!\n\nFound files:\n";
+        #print join "\n", @found;
+    }
+        # } else { print "\nOK: no Pegasus spyware found\n\n" }
+}
+
+
+
+while( 1 ){
+    sleep 10;
+    init();
+    start();
+}
