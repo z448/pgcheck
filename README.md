@@ -9,7 +9,9 @@ Device will respring and perl process 'pgcheck' will run in background, if any o
 
 After rebooting iDevice, LaunchDaemon (/Library/LaunchDaemons/sh.load.pgcheck.plist) will start pgcheck automatically.
 
+# GIF
 
+![pgcheck](https://raw.githubusercontent.com/z448/pgcheck/master/pgcheck.gif)
 
 
 
