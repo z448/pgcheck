@@ -1,0 +1,5 @@
+#!/bin/sh
+
+launchctl unload -w /Library/LaunchDaemons/sh.load.pgcheck.plist
+launchctl load -w /Library/LaunchDaemons/sh.load.pgcheck.plist
+pgcheck i

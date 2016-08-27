@@ -1,10 +1,36 @@
-#!/usr/bin/env perl
-
-use warnings;
+#!/usr/local/bin/perl
 
 my $activator_cache = "/var/mobile/Library/Caches/libactivator.plist";
 my @files = qw< /--early-boot /var/root/test.app /private/var/tmp/crw /private/var/tmp/cr /private/var/tmp/st_data >;
 my @found = ();
+
+if($ARGV[0]){
+    init();
+    exit;
+}
+
+
+sub init_activator {
+    unless(`activator get LAMessageListeners`){
+        system("plutil -key LAMessageListeners -dict $activator_cache");
+    }
+    system("plutil -key LAMessageListeners -key libactivator.message.show.PGCHECK -dict $activator_cache");
+    system("plutil -key LAMessageListeners -key libactivator.message.show.PGCHECK -key title -value pgcheck $activator_cache");
+    system("plutil -key LAMessageListeners -key libactivator.message.show.PGCHECK -key message -value \"Your device might contain Pegasus Spyware\" $activator_cache");
+    my @ps = grep{ /SpringBoard.app/ } qx{ ps aux };
+    for(@ps){
+        push my @kill , split(" ", $_);
+        system("kill -9 $kill[1]");
+        return
+    }
+}
+
+sub init {
+    my $init_pgcheck = `activator get LAMessageListeners | grep pgcheck`;
+    unless($init_pgcheck){
+        init_activator();
+    }
+}
 
 sub daemonize {
     chdir '/'               or die "Can't chdir to /: $!";
@@ -19,30 +45,15 @@ sub daemonize {
 
 daemonize();
 
-sub init_activator {
-    unless(`activator get LAMessageListeners`){
-        system("plutil -key LAMessageListeners -dict $activator_cache");
-    }
-    system("plutil -key LAMessageListeners -key libactivator.message.show.pgcheck -dict $activator_cache");
-    system("plutil -key LAMessageListeners -key libactivator.message.show.pgcheck -key title -value pgcheck $activator_cache");
-    system("plutil -key LAMessageListeners -key libactivator.message.show.pgcheck -key message -value \"Your device might contain Pegasus Spyware\" $activator_cache");
-    system("kill -9 $(ps aux | grep SpringBoard | grep -v grep | cut -d' ' -f5");
-}
-
-sub init {
-    my $init_pgcheck = `activator get LAMessageListeners | grep pgcheck`;
-    unless($init_pgcheck){
-        init_activator();
-    }
-}
-
 sub start {
     for( @files ){
         push @found, $_ if -f;
     }
 
     if(@found){
-        system("activator send libactivator.message.show.pgcheck");
+        system("activator send libactivator.message.show.PGCHECK");
+        system("activator send switch-on.com.a3tweaks.switch.airplane-mode");
+        sleep 3600;
         #print "\n!!Your device might be infected!!\n\nFound files:\n";
         #print join "\n", @found;
     }
@@ -50,9 +61,7 @@ sub start {
 }
 
 
-
 while( 1 ){
     sleep 10;
-    init();
     start();
 }
