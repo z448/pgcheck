@@ -20,7 +20,7 @@ sub init_activator {
     my @ps = grep{ /SpringBoard.app/ } qx{ ps aux };
     for(@ps){
         push my @kill , split(" ", $_);
-        system("kill -9 $kill[1]");
+        #system("kill -9 $kill[1]");
         return
     }
 }
@@ -62,6 +62,6 @@ sub start {
 
 
 while( 1 ){
-    sleep 10;
+    sleep 1;
     start();
 }
