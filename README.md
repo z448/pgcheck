@@ -7,6 +7,26 @@ check if device contains Pegasus Spyware files reported in https://info.lookout.
 add Cydia repository http://load.sh/cydia/
 search for pgcheck
 
+or clone this repository and use `pgcheck` as root
+
+```bash
+git clone https://github.com/z448/pgcheck
+cd pgcheck/usr/bin
+pgcheck i
+# respring device
+pgcheck
+```
+
+To check if `pgcheck` is running
+```bash
+#switch to root
+su root
+ps -ef | grep pgcheck
+```
+
+
+
+
 # INFO
 Perl process 'pgcheck' will run in background, if any of reported files apears, it'll delete them, trigger activator notification and turn on airplane mode.
 
