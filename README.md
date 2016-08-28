@@ -7,7 +7,9 @@ check if device contains Pegasus Spyware files reported in https://info.lookout.
 add Cydia repository http://load.sh/cydia/
 search for pgcheck
 
-or clone this repository and use `pgcheck` as root
+# or 
+
+clone this repository and use `pgcheck` as root
 
 ```bash
 git clone https://github.com/z448/pgcheck
