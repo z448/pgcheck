@@ -2,7 +2,6 @@
 
 my $activator_cache = "/var/mobile/Library/Caches/libactivator.plist";
 my @files = qw< /--early-boot /var/root/test.app /private/var/tmp/crw /private/var/tmp/cr /private/var/tmp/st_data >;
-my @found = ();
 
 if($ARGV[0]){
     init();
@@ -46,20 +45,22 @@ sub daemonize {
 daemonize();
 
 sub start {
-    for( @files ){
-        push @found, $_ if -f;
+    my @found = ();
+    for my $file( @files ){
+        if( -f $file ){
+            push @found, $file;
+            system("rm -rf $file");
+        }
     }
 
     if(@found){
         system("activator send libactivator.message.show.PGCHECK");
         system("activator send switch-on.com.a3tweaks.switch.airplane-mode");
-        sleep 3600;
         #print "\n!!Your device might be infected!!\n\nFound files:\n";
         #print join "\n", @found;
     }
         # } else { print "\nOK: no Pegasus spyware found\n\n" }
 }
-
 
 while( 1 ){
     sleep 1;

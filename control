@@ -1,5 +1,5 @@
 Name: pgcheck
-Version: 2.3
+Version: 2.7-1
 Author: zed448 <z448> <zed448@icloud.com>
 Architecture: iphoneos-arm
 Package: pgcheck
@@ -7,5 +7,5 @@ Section: Utility
 Maintainer: zed448 <z448> <zed448@icloud.com>
 Homepage: http://load.sh
 Description: check if device contains Pegasus Spyware files
-Depends: perl, libactivator, com.ericasadun.utilities
+Depends: perl, libactivator, com.ericasadun.utilities, mobilesubstrate
 
