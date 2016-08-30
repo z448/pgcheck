@@ -1,9 +1,16 @@
 #!/usr/local/bin/perl
 
+# detect Pegasus spyware in iOS
+# https://info.lookout.com/rs/051-ESQ-475/images/lookout-pegasus-technical-analysis.pdf
+
+use warnings;
+use strict;
+
+use POSIX qw(setsid);
 use File::Find;
 use File::Compare;
 
-my $log = "/private/var/tmp/pgcheck.log";
+my $log = "/var/mobile/Documents/pgcheck.log";
 my $jsc = "/System/Library/Frameworks/JavaScriptCore.framework/Resources/jsc";
 my $activator_cache = "/var/mobile/Library/Caches/libactivator.plist";
 
@@ -16,11 +23,6 @@ sub init_activator {
     system("plutil -key LAMessageListeners -key libactivator.message.show.PGCHECK -dict $activator_cache");
     system("plutil -key LAMessageListeners -key libactivator.message.show.PGCHECK -key title -value pgcheck $activator_cache");
     system("plutil -key LAMessageListeners -key libactivator.message.show.PGCHECK -key message -value \"Your device might contain Pegasus Spyware\" $activator_cache");
-    my @ps = grep{ /SpringBoard.app/ } qx{ ps aux };
-    for(@ps){
-        push my @kill , split(" ", $_);
-        return
-    }
 }
 
 sub init {
@@ -31,13 +33,13 @@ sub init {
 }
 
 sub daemonize {
-    chdir '/'               or die "Can't chdir to /: $!";
+    no strict 'subs';
+    chdir '/' or die "Can't chdir to /: $!";
     open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
     open STDOUT, '>>/dev/null' or die "Can't write to /dev/null: $!";
-   
     defined(my $pid = fork) or die "Can't fork: $!";
     exit if $pid;
-    setsid                  or die "Can't start a new session: $!";
+    setsid or die "Can't start a new session: $!";
     open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
 }
 
@@ -46,7 +48,7 @@ daemonize();
 sub start {
     find( sub{ if( my $compare = compare("$File::Find::dir/$_", $jsc) == 0 ){
                 open(my $fh,">>", $log) || die "cant open $log";
-                print $fh '[pgcheck] ' . localtime() . ': ' . "$File::Find::dir/$_ is copy of $jsc\n";
+                print $fh '[pgcheck] ' . localtime() . ': ' . "$File::Find::dir/$_ is a copy of $jsc\n";
                 close $fh;
                 system("activator send libactivator.message.show.PGCHECK");
                 system("activator send switch-on.com.a3tweaks.switch.airplane-mode");
