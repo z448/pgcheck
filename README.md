@@ -3,7 +3,7 @@
 - removed deleting of files as modified spyware could use different names 
 - log will be written into `/var/mobile/Documents/pgcheck.log` after triggering notification + airplane mode
 
-*update v2.7-1* - `pgcheck` will now also remove Pegasus files, then trigger alert + airplane mode
+*update v2.7-1* - ~~`pgcheck` will now also remove Pegasus files~~, then trigger alert + airplane mode
 
 # pgcheck
 check if device contains Pegasus Spyware files reported in https://info.lookout.com/rs/051-ESQ-475/images/lookout-pegasus-technical-analysis.pdf
