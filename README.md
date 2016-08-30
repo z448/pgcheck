@@ -1,3 +1,8 @@
+*update v2.8-7* 
+- pgcheck is now comparing files to 'jsc' binary which is needed by Pegasus
+- removed deleting of files as modified spyware could use different names 
+- added log to /var/mobile/Documents/pgcheck.log
+
 *update v2.7-1* - `pgcheck` will now also remove Pegasus files, then trigger alert + airplane mode
 
 # pgcheck
