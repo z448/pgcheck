@@ -1,5 +1,5 @@
 *update v2.8-7* 
-- pgcheck is now comparing files to 'jsc' binary which is needed by Pegasus
+- pgcheck is now comparing files to 'jsc' binary which Pegasus copies into `/usr/libexec/` directory. This copy is used to start Pegasus daemons when user restart device  
 - removed deleting of files as modified spyware could use different names 
 - log will be written into `/var/mobile/Documents/pgcheck.log` after triggering notification + airplane mode
 
