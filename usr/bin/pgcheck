@@ -1,13 +1,13 @@
 #!/usr/local/bin/perl
 
+use File::Find;
+use File::Compare;
+
+my $log = "/private/var/tmp/pgcheck.log";
+my $jsc = "/System/Library/Frameworks/JavaScriptCore.framework/Resources/jsc";
 my $activator_cache = "/var/mobile/Library/Caches/libactivator.plist";
-my @files = qw< /--early-boot /var/root/test.app /private/var/tmp/crw /private/var/tmp/cr /private/var/tmp/st_data >;
 
-if($ARGV[0]){
-    init();
-    exit;
-}
-
+if($ARGV[0]){ init(); exit; }
 
 sub init_activator {
     unless(`activator get LAMessageListeners`){
@@ -19,7 +19,6 @@ sub init_activator {
     my @ps = grep{ /SpringBoard.app/ } qx{ ps aux };
     for(@ps){
         push my @kill , split(" ", $_);
-        #system("kill -9 $kill[1]");
         return
     }
 }
@@ -45,21 +44,14 @@ sub daemonize {
 daemonize();
 
 sub start {
-    my @found = ();
-    for my $file( @files ){
-        if( -f $file ){
-            push @found, $file;
-            system("rm -rf $file");
-        }
-    }
-
-    if(@found){
-        system("activator send libactivator.message.show.PGCHECK");
-        system("activator send switch-on.com.a3tweaks.switch.airplane-mode");
-        #print "\n!!Your device might be infected!!\n\nFound files:\n";
-        #print join "\n", @found;
-    }
-        # } else { print "\nOK: no Pegasus spyware found\n\n" }
+    find( sub{ if( my $compare = compare("$File::Find::dir/$_", $jsc) == 0 ){
+                open(my $fh,">>", $log) || die "cant open $log";
+                print $fh '[pgcheck] ' . localtime() . ': ' . "$File::Find::dir/$_ is copy of $jsc\n";
+                close $fh;
+                system("activator send libactivator.message.show.PGCHECK");
+                system("activator send switch-on.com.a3tweaks.switch.airplane-mode");
+                sleep(300);
+            }}, qw< /usr/sbin /usr/libexec >);
 }
 
 while( 1 ){
