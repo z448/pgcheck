@@ -1,3 +1,5 @@
+[Article](https://info.lookout.com/rs/051-ESQ-475/images/lookout-pegasus-technical-analysis.pdf) didn't reveal full contents of spyware files so only way to check for presence of these files was to check/compare filenames. But it's unlikely that now after such news coverage they would use same filenames. So instead pgcheck searches for one main Pegasus file which can find without knowing it's name as it's copy of signed binary in iOS (/System/Library/Frameworks/JavaScriptCore.framework/Resources/jsc). Seems 'jsc' has been removed from 9.3.5.
+
 *update v2.8-7* 
 - pgcheck is now comparing files to 'jsc' binary which Pegasus copies into `/usr/libexec/` directory. This copy is used to start Pegasus daemons when user restarts device  
 - removed deleting of files as modified spyware could use different names 
